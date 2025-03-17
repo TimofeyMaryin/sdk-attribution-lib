@@ -39,6 +39,8 @@ class MainActivity : ComponentActivity() {
             var deviceId by remember { mutableStateOf("") }
             var installReferrer by remember { mutableStateOf("") }
             var isFirst by remember { mutableStateOf("") }
+            var appName by remember { mutableStateOf("") }
+            var gaid by remember { mutableStateOf("") }
 
 
             LaunchedEffect(key1 = Unit) {
@@ -47,11 +49,13 @@ class MainActivity : ComponentActivity() {
                     deviceId = it.deviceId
                     installReferrer = it.installReferrer ?: "Error"
                     isFirst = it.isFirstInstall.toString()
+                    appName = it.appName
+                    gaid = it.googleAdId ?: "Error"
                 }
             }
             AttributionSDKTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                         Card {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,6 +69,10 @@ class MainActivity : ComponentActivity() {
                                 Text(text = "InstallReferrer: $installReferrer")
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(text = "Is First Launch: $isFirst")
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(text = "App Name: $appName")
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(text = "Google AD ID: $gaid")
 
                             }
 
