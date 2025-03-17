@@ -18,4 +18,5 @@ data class InstallData(
     val isFromPlayStore: Boolean,
     val timestamp: Long = System.currentTimeMillis(),
     val unityAdsData: String?,
+    val utmData: String?
 )
