@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.android.installreferrer.api.ReferrerDetails
 import com.attribution.sdk.data.InstallData
 import com.attribution.sdk.info.DeviceInfo
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -140,24 +139,6 @@ class AttributionSDK(private val context: Context) {
         prefs.edit().putBoolean("isInstalled", true).apply()
     }
 
-    private fun fetchInstallReferrer(onResult: (String?) -> Unit) {
-        val referrerClient = InstallReferrerClient.newBuilder(context).build()
-        referrerClient.startConnection(object : InstallReferrerStateListener {
-            override fun onInstallReferrerSetupFinished(responseCode: Int) {
-                if (responseCode == InstallReferrerClient.InstallReferrerResponse.OK) {
-                    val response = referrerClient.installReferrer
-                    onResult(response.installReferrer)
-                } else {
-                    onResult(null)
-                }
-                referrerClient.endConnection()
-            }
-
-            override fun onInstallReferrerServiceDisconnected() {
-                onResult(null)
-            }
-        })
-    }
 
     // Симуляция интеграции с Unity ADS
     private fun fetchUnityAdsData(): String {

@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sdk = AttributionSDK(this)
+        val sdkEvent = AttributionSDKEvent(this)
 
         enableEdgeToEdge()
         setContent {
@@ -44,6 +47,11 @@ class MainActivity : ComponentActivity() {
             var isFirst by remember { mutableStateOf("") }
             var appName by remember { mutableStateOf("") }
             var gaid by remember { mutableStateOf("") }
+            var deviceModel by remember { mutableStateOf("") }
+            var deviceManufacturer by remember { mutableStateOf("") }
+            var apiLevel by remember { mutableStateOf("") }
+
+
 
 
             LaunchedEffect(key1 = Unit) {
@@ -54,12 +62,23 @@ class MainActivity : ComponentActivity() {
                     isFirst = it.isFirstInstall.toString()
                     appName = it.appName
                     gaid = it.googleAdId ?: "Error"
+                    deviceModel = it.deviceModel
+                    deviceManufacturer = it.deviceManufacturer
+                    apiLevel = it.apiLevel.toString()
                 }
             }
             AttributionSDKTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                        Card {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(.8f)
+                        ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
@@ -80,7 +99,17 @@ class MainActivity : ComponentActivity() {
                             }
 
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
 
+                        Button(onClick = { sdkEvent.sendEventToServer("test_event_1") }) {
+                            Text(text = "Send Event 1")
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(onClick = { sdkEvent.sendEventToServer("test_event_2") }) {
+                            Text(text = "Send Event 2")
+                        }
                     }
                 }
             }
