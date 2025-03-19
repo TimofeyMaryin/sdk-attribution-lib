@@ -65,7 +65,6 @@ class AttributionSDK(private val context: Context) {
             return
         }
 
-        // ⚡️ Запускаем параллельно получение GAID, InstallReferrer и UTM
         CoroutineScope(Dispatchers.IO).launch {
             val gaidDeferred = async { fetchGoogleAdId(context) }
             val referrerDeferred = async { fetchInstallReferrer() }
@@ -75,7 +74,6 @@ class AttributionSDK(private val context: Context) {
             val installReferrer = referrerDeferred.await()
             val utmData = utmDeferred.await()
 
-            // ✅ Обновляем InstallData
             val updatedInstallData = installData.copy(
                 googleAdId = googleAdId,
                 installReferrer = installReferrer,
@@ -86,8 +84,6 @@ class AttributionSDK(private val context: Context) {
             data(updatedInstallData)
             sendDataToServer(serverUrl, updatedInstallData)
 
-            // Помечаем установку как завершённую
-            sendDataToServer(serverUrl, installData)
             markInstalled()
         }
     }
@@ -142,8 +138,6 @@ class AttributionSDK(private val context: Context) {
 
     // Симуляция интеграции с Unity ADS
     private fun fetchUnityAdsData(): String {
-        // Здесь можно реализовать вызовы к Unity Ads SDK.
-        // Для MVP возвращаем симулированное значение.
         return "unity_ads_simulated_data"
     }
 
