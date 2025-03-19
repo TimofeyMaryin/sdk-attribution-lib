@@ -35,7 +35,7 @@ class AttributionSDK(private val context: Context) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendInstallData(
         serverUrl: String,
-        data: (InstallData) -> Unit, // DEBUG!!
+        data: (InstallData) -> Unit,
     ) {
         val deviceInfo = DeviceInfo(context)
 
@@ -83,8 +83,8 @@ class AttributionSDK(private val context: Context) {
             Log.e("TAG", "sendInstallData: $updatedInstallData")
             data(updatedInstallData)
             sendDataToServer(serverUrl, updatedInstallData)
-
             markInstalled()
+
         }
     }
 
@@ -142,6 +142,7 @@ class AttributionSDK(private val context: Context) {
     }
 
     private fun sendDataToServer(serverUrl: String, installData: InstallData) {
+        Log.e("TAG", "sendDataToServer: START", )
         val json = gson.toJson(installData)
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val body = json.toRequestBody(mediaType)
@@ -158,7 +159,7 @@ class AttributionSDK(private val context: Context) {
             }
             override fun onResponse(call: Call, response: Response) {
                 // Можно добавить обработку успешного ответа
-                Log.e("TAG", "onResponse success: ${response.body?.string()}", )
+                Log.e("TAG", "onResponse success: ${response.body?.string()}; response code: ${response.code}", )
                 response.close()
             }
         })
@@ -167,3 +168,5 @@ class AttributionSDK(private val context: Context) {
 
 
 }
+
+

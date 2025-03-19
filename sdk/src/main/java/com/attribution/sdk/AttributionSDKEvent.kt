@@ -22,7 +22,6 @@ class AttributionSDKEvent(private val context: Context) {
 
     fun sendEventToServer(eventName: String) {
 
-
         val eventData = EventData(
             event = eventName,
             bundleId = context.packageName,

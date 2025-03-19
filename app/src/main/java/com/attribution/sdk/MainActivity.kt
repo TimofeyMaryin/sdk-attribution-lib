@@ -2,6 +2,7 @@ package com.attribution.sdk
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
 
 
             LaunchedEffect(key1 = Unit) {
+                Log.e("TAG", "onCreate: launch effect Start", )
                 sdk.sendInstallData("http://192.168.1.227:8080") {
                     bundleId = it.bundleId
                     deviceId = it.deviceId
