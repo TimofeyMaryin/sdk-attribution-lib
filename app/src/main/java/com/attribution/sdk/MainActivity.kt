@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
                     apiLevel = it.apiLevel.toString()
                 }
             }
+
             AttributionSDKTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(

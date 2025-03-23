@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
+import com.attribution.sdk.data.AuthModel
+import com.attribution.sdk.data.AuthToken
 import com.attribution.sdk.data.InstallData
 import com.attribution.sdk.info.DeviceInfo
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -135,6 +137,10 @@ class AttributionSDK(private val context: Context) {
         prefs.edit().putBoolean("isInstalled", true).apply()
     }
 
+    private fun saveTokenKey(token: String) {
+        prefs.edit().putString("token", token).apply()
+    }
+
 
     // Симуляция интеграции с Unity ADS
     private fun fetchUnityAdsData(): String {
@@ -145,27 +151,76 @@ class AttributionSDK(private val context: Context) {
         Log.e("TAG", "sendDataToServer: START", )
         val json = gson.toJson(installData)
         val mediaType = "application/json; charset=utf-8".toMediaType()
+
+        getAccessTokenKey(serverUrl) { token ->
+            saveTokenKey(token)
+            val body = json.toRequestBody(mediaType)
+            val request = Request.Builder()
+                .url("$serverUrl/install")
+                .addHeader("Authorization", "Bearer $token")
+                .post(body)
+                .build()
+
+            httpClient.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    // Обработка ошибки отправки данных
+                    Log.e("TAG", "onFailure httpClient: ${e.printStackTrace()}", )
+                    e.printStackTrace()
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    // Можно добавить обработку успешного ответа
+                    Log.e("TAG", "onResponse success: ${response.body?.string()}; response code: ${response.code}", )
+                    response.close()
+                }
+            })
+        }
+
+
+
+
+    }
+
+    private fun getAccessTokenKey(
+        serverUrl: String,
+        onTokenKey: (String) -> Unit
+    ) {
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val json = gson.toJson(AuthModel("ADMIN", "PASS"))
         val body = json.toRequestBody(mediaType)
         val request = Request.Builder()
-            .url("$serverUrl/install")
+            .url("$serverUrl/login")
             .post(body)
             .build()
 
-        httpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                // Обработка ошибки отправки данных
-                Log.e("TAG", "onFailure httpClient: ${e.printStackTrace()}", )
-                e.printStackTrace()
+        httpClient.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("TAG", "onFailure httpClient: ${e.message}", )
+                    e.printStackTrace()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!response.isSuccessful) {
+                            Log.e("TAG", "Request failed: ${response.code}")
+                            return
+                        }
+
+                        val responseBodyString = response.body?.string()
+
+                        if (responseBodyString != null) {
+                            val token = gson.fromJson(responseBodyString, AuthToken::class.java)
+                            onTokenKey(token.token)
+                        } else {
+                            Log.e("TAG", "Empty response body")
+                        }
+                        Log.e("TAG", "onResponse success: $responseBodyString; response code: ${response.code}", )
+                    }
+                }
             }
-            override fun onResponse(call: Call, response: Response) {
-                // Можно добавить обработку успешного ответа
-                Log.e("TAG", "onResponse success: ${response.body?.string()}; response code: ${response.code}", )
-                response.close()
-            }
-        })
+        )
     }
-
-
 
 }
 

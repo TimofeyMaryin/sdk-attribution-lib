@@ -3,6 +3,8 @@ package com.attribution.sdk
 import android.content.Context
 import android.hardware.usb.UsbDevice.getDeviceId
 import android.util.Log
+import com.attribution.sdk.data.AuthModel
+import com.attribution.sdk.data.AuthToken
 import com.attribution.sdk.data.EventData
 import com.attribution.sdk.info.DeviceInfo
 import com.google.gson.Gson
@@ -16,6 +18,8 @@ import okhttp3.Response
 import java.io.IOException
 
 class AttributionSDKEvent(private val context: Context) {
+
+    private val prefs = context.getSharedPreferences("attribution_sdk", Context.MODE_PRIVATE)
 
     private val deviceInfo = DeviceInfo(context)
     private val gson = Gson()
@@ -31,6 +35,7 @@ class AttributionSDKEvent(private val context: Context) {
         val json = gson.toJson(eventData)
         val request = Request.Builder()
             .url("http://192.168.1.227:8080/event")
+            .addHeader("Authorization", "Bearer ${getToken()}")
             .post(json.toRequestBody("application/json".toMediaType()))
             .build()
 
@@ -43,5 +48,13 @@ class AttributionSDKEvent(private val context: Context) {
             }
         })
     }
+
+    private fun getToken(): String {
+        val token = prefs.getString("token", "") ?: "Error"
+        Log.e("TAG", "getToken: $token", )
+        return token
+
+    }
+
 
 }
