@@ -36,7 +36,6 @@ class AttributionSDK(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendInstallData(
-        serverUrl: String,
         data: (InstallData) -> Unit,
     ) {
         val deviceInfo = DeviceInfo(context)
@@ -84,7 +83,7 @@ class AttributionSDK(private val context: Context) {
 
             Log.e("TAG", "sendInstallData: $updatedInstallData")
             data(updatedInstallData)
-            sendDataToServer(serverUrl, updatedInstallData)
+            sendDataToServer(updatedInstallData)
             markInstalled()
 
         }
@@ -147,16 +146,16 @@ class AttributionSDK(private val context: Context) {
         return "unity_ads_simulated_data"
     }
 
-    private fun sendDataToServer(serverUrl: String, installData: InstallData) {
+    private fun sendDataToServer(installData: InstallData) {
         Log.e("TAG", "sendDataToServer: START", )
         val json = gson.toJson(installData)
         val mediaType = "application/json; charset=utf-8".toMediaType()
 
-        getAccessTokenKey(serverUrl) { token ->
+        getAccessTokenKey() { token ->
             saveTokenKey(token)
             val body = json.toRequestBody(mediaType)
             val request = Request.Builder()
-                .url("$serverUrl/install")
+                .url("$BASE_URL/install")
                 .addHeader("Authorization", "Bearer $token")
                 .post(body)
                 .build()
@@ -181,7 +180,6 @@ class AttributionSDK(private val context: Context) {
     }
 
     private fun getAccessTokenKey(
-        serverUrl: String,
         onTokenKey: (String) -> Unit
     ) {
 
@@ -189,7 +187,7 @@ class AttributionSDK(private val context: Context) {
         val json = gson.toJson(AuthModel("ADMIN", "PASS"))
         val body = json.toRequestBody(mediaType)
         val request = Request.Builder()
-            .url("$serverUrl/login")
+            .url("$BASE_URL/login")
             .post(body)
             .build()
 
@@ -220,6 +218,10 @@ class AttributionSDK(private val context: Context) {
                 }
             }
         )
+    }
+
+    companion object {
+        const val BASE_URL = "http://192.168.1.227:8080"
     }
 
 }

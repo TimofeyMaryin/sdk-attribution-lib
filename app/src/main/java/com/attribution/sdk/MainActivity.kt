@@ -32,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.attribution.sdk.ui.theme.AttributionSDKTheme
 
+
+
 class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -57,7 +59,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(key1 = Unit) {
                 Log.e("TAG", "onCreate: launch effect Start", )
-                sdk.sendInstallData("http://192.168.1.227:8080") {
+                sdk.sendInstallData() {
                     bundleId = it.bundleId
                     deviceId = it.deviceId
                     installReferrer = it.installReferrer ?: "Error"

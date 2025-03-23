@@ -24,7 +24,9 @@ class AttributionSDKEvent(private val context: Context) {
     private val deviceInfo = DeviceInfo(context)
     private val gson = Gson()
 
-    fun sendEventToServer(eventName: String) {
+    fun sendEventToServer(
+        eventName: String
+    ) {
 
         val eventData = EventData(
             event = eventName,
@@ -34,7 +36,7 @@ class AttributionSDKEvent(private val context: Context) {
 
         val json = gson.toJson(eventData)
         val request = Request.Builder()
-            .url("http://192.168.1.227:8080/event")
+            .url("${AttributionSDK.BASE_URL}/event")
             .addHeader("Authorization", "Bearer ${getToken()}")
             .post(json.toRequestBody("application/json".toMediaType()))
             .build()
